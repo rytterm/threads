@@ -63,8 +63,6 @@ void thread_ready(thread* t) {
 
 
 void thread_yield(void) {
-    thread* t = thread_current();
-
 }
 
 
@@ -94,10 +92,25 @@ void allocate_tid(thread* t) {
 }
 
 
-void thread_entry(void) {
+void NORETURN thread_entry(void) {
     thread* t = thread_current();
+    ASSERT(t != NULL);
     ASSERT(t->func != NULL);
-
+    ASSERT(t->aux != NULL);
     t->func(t->aux);
+    thread_exit();
+    __builtin_unreachable();
+}
+
+void NORETURN thread_exit(void) {
+    thread* t = thread_current();
+    ASSERT(t != NULL);
+    t->status = THREAD_DYING;
+    free(t);
+
+    exit(0);
+
+
+    __builtin_unreachable();
 
 }

@@ -47,7 +47,8 @@ void allocate_tid(thread*);
 thread* thread_current(void);
 thread* thread_running(void);
 void thread_ready(thread*);
-void thread_entry(void);
+void thread_entry(void) NORETURN;
+void thread_exit(void) NORETURN;
 
 
 

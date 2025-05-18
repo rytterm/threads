@@ -11,6 +11,11 @@ void f(int i) {
 
 int main () {
     init_thread_system();
-    tid_t tid = thread_create((func_t*)f,(void*)1);
+    func_t* func = (func_t*)f;
+    int i = 1;
+    void* aux = (void*)i;
+
+    tid_t tid = thread_create(func,aux);
+
     return (EXIT_SUCCESS);
 }
