@@ -2,18 +2,19 @@
 #define _CONTEXT_H_
 
 #include <stdint.h>
-#include "thread.h"
+#include "debug.h"
+
 
 typedef struct Context {
     uintptr_t sp;
     uintptr_t pc;
 } ctx;
 
-typedef struct Thread thread;
 
 
-void ctx_init(thread*,ctx*);
-
+void ctx_init(ctx*, uint8_t*);
+void ctx_restore(ctx*) NORETURN;
+void ctx_save(ctx*);
 
 
 #endif

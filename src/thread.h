@@ -8,6 +8,7 @@
 
 #define THREAD_MAGIC    0xDEADBEEF
 #define STACK_SIZE      1024
+#define ALLOC_SIZE      4096
 
 
 enum thread_status {
@@ -24,6 +25,7 @@ typedef void func_t (void* aux);
 typedef int tid_t;
 #define TID_ERROR ((tid_t) -1)
 
+
 typedef struct Thread {
     tid_t               tid;
     uint8_t*            stack;
@@ -32,11 +34,11 @@ typedef struct Thread {
     func_t*             func;
     void*               aux;
     sema                idle;
+    struct Context      context;
 } thread;
 
 
 
-typedef struct Context ctx;
 
 void init_thread_system(void);
 tid_t thread_create(func_t*,void*);
@@ -44,7 +46,8 @@ void thread_yield(void);
 void allocate_tid(thread*);
 thread* thread_current(void);
 thread* thread_running(void);
-void thread_ready(thread* t);
+void thread_ready(thread*);
+void thread_entry(void);
 
 
 

@@ -5,6 +5,8 @@
 #include <stdlib.h>
 
 
+#define NORETURN __attribute__((noreturn))
+
 #ifndef NDEBUG
 #define ASSERT(EXPR) \
     do { \

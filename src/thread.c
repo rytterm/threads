@@ -1,25 +1,10 @@
 #include "thread.h"
 
 
-static inline size_t round_up_pow_two(size_t x) {
-    x--;
-    x |= x >> 1;
-    x |= x >> 2;
-    x |= x >> 4;
-    x |= x >> 8;
-    x |= x >> 16;
-#if SIZE_MAX > 0xFFFFFFFF
-    x |= x >> 32;
-#endif
-    return x + 1;
-}
 
-#define BASE_SIZE sizeof(thread) + STACK_SIZE
-#define ALLOC_SIZE (round_up_pow_two(BASE_SIZE))
 
 static thread* idle_thread;
 static list thread_list;
-static ctx* context;
 
 
 void init_thread_system(void) {
@@ -44,9 +29,12 @@ tid_t thread_create(func_t* func, void* aux) {
     t->stack = (uint8_t*)t + ALLOC_SIZE;
     t->stack -= sizeof(thread*);
     *((thread**)t->stack) = t;
+    t->stack -= sizeof(void*);
+    *((void**)t->stack) = thread_entry;
 
 
-    __asm__ volatile("mov %0, %%rsp" : : "r"(t->stack));
+    ctx_init(&t->context,t->stack);
+    ctx_restore(&t->context);
 
 
     ASSERT(t->stack != NULL);
@@ -86,7 +74,6 @@ thread* thread_current(void) {
     ASSERT(t != NULL);
     ASSERT(t->magic == THREAD_MAGIC);
 
-    t->func(t->aux);
 
     return t;
 }
@@ -107,3 +94,10 @@ void allocate_tid(thread* t) {
 }
 
 
+void thread_entry(void) {
+    thread* t = thread_current();
+    ASSERT(t->func != NULL);
+
+    t->func(t->aux);
+
+}
