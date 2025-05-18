@@ -3,6 +3,8 @@
 
 #include "context.h"
 #include "debug.h"
+#include "list.h"
+
 
 #define THREAD_MAGIC    0xDEADBEEF
 #define STACK_SIZE      1024
@@ -43,6 +45,8 @@ typedef struct Thread {
 } thread;
 
 
+
+void init_thread_system(void);
 tid_t thread_create(func_t*,void*);
 void thread_yield(void);
 void allocate_tid(thread*);

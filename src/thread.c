@@ -3,8 +3,11 @@
 
 
 static thread* idle_thread;
+static list thread_list;
 
-
+void init_thread_system(void) {
+    list_init(&thread_list);
+}
 
 
 tid_t thread_create(func_t* func, void* aux) {
@@ -23,7 +26,10 @@ tid_t thread_create(func_t* func, void* aux) {
     ASSERT(t->func != NULL);
 
 
-    idle_thread = thread_current();
+    idle_thread = t;
+    list_push_back(&thread_list, gen_node(idle_thread));
+
+    print_list(&thread_list);
 
     return t->tid;
 }

@@ -5,16 +5,23 @@
 #include <stdbool.h>
 #include "debug.h"
 
-typedef struct List {
+typedef struct Thread thread;
+
+typedef struct Node {
     thread* t;
-    struct List* next;
+    struct Node* next;
+} node;
+
+
+typedef struct List {
+    node* head;
+    node* tail;
 } list;
 
-list* head;
-list* tail;
 
-void list_init(void);
-void list_push_back(list*, thread*);
-bool empty(list*);
+void list_init(list*);
+void list_push_back(list*,node*);
+void print_list(list*);
+node* gen_node(thread*);
 
 #endif
