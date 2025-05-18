@@ -10,16 +10,6 @@
 #define STACK_SIZE      1024
 
 
-#define BITMASK(SHIFT, CNT) (((1ull << (CNT)) - 1) << (SHIFT))
-
-/* Page offset (bits 0:12). */
-#define PGSHIFT 0                          /* Index of first offset bit. */
-#define PGBITS  12                         /* Number of offset bits. */
-#define PGSIZE  (1 << PGBITS)              /* Bytes in a page. */
-#define PGMASK  BITMASK(PGSHIFT, PGBITS)   /* Page offset bits (0:12). */
-
-
-
 enum thread_status {
     THREAD_RUNNING,
     THREAD_READY,
@@ -45,6 +35,8 @@ typedef struct Thread {
 } thread;
 
 
+
+typedef struct Context ctx;
 
 void init_thread_system(void);
 tid_t thread_create(func_t*,void*);

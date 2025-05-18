@@ -33,6 +33,7 @@ void print_list(list* l) {
 
 node* gen_node(thread* t) {
     node* n = malloc(sizeof(node));
+
     n->t = t;
     n->next = NULL;
     return n;
