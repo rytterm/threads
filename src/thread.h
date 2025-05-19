@@ -4,7 +4,8 @@
 #include "context.h"
 #include "debug.h"
 #include "list.h"
-
+#include <stdint.h>
+#include <stdbool.h>
 
 #define THREAD_MAGIC    0xDEADBEEF
 #define STACK_SIZE      1024
@@ -18,7 +19,6 @@ enum thread_status {
     THREAD_DYING
 };
 
-typedef int sema;
 
 typedef void func_t (void* aux);
 
@@ -33,8 +33,7 @@ typedef struct Thread {
     enum thread_status  status;
     func_t*             func;
     void*               aux;
-    sema                idle;
-    struct Context      context;
+    bool                idle;
 } thread;
 
 
@@ -49,6 +48,8 @@ thread* thread_running(void);
 void thread_ready(thread*);
 void thread_entry(void) NORETURN;
 void thread_exit(void) NORETURN;
+void scheduler(void);
+
 
 
 

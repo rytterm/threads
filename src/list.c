@@ -19,6 +19,35 @@ void list_push_back(list* l, node* n) {
 }
 
 
+void list_remove(list* l, node* n) {
+    ASSERT(l != NULL);
+    ASSERT(n != NULL);
+
+    node* tmp = l->head;
+    node* prev = NULL;
+
+    while (tmp != NULL) {
+        if (tmp == n) {
+            if (prev == NULL) {
+                l->head = tmp->next;
+                if (l->tail == tmp) {
+                    l->tail = NULL;
+                }
+            } else {
+                prev->next = tmp->next;
+                if (l->tail == tmp) {
+                    l->tail = prev;
+                }
+            }
+            free(tmp);
+            return;
+        }
+        prev = tmp;
+        tmp = tmp->next;
+    }
+}
+
+
 void print_list(list* l) {
     ASSERT(l != NULL);
     node* tmp = l->head;

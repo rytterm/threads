@@ -5,16 +5,10 @@
 #include "debug.h"
 
 
-typedef struct Context {
-    uintptr_t sp;
-    uintptr_t pc;
-} ctx;
 
-
-
-void ctx_init(ctx*, uint8_t*);
-void ctx_restore(ctx*) NORETURN;
-void ctx_save(ctx*);
+void ctx_switch(uint8_t*, uint8_t*);
+void ctx_restore(uint8_t*) NORETURN;
+void ctx_save(uint8_t*);
 
 
 #endif

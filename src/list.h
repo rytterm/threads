@@ -21,6 +21,7 @@ typedef struct List {
 
 void list_init(list*);
 void list_push_back(list*,node*);
+void list_remove(list*, node*);
 void print_list(list*);
 node* gen_node(thread*);
 

@@ -2,7 +2,6 @@
 
 
 
-
 static thread* idle_thread;
 static list thread_list;
 
@@ -19,37 +18,28 @@ tid_t thread_create(func_t* func, void* aux) {
     
     thread* t = (thread*)memory;
     ASSERT(t != NULL);
+    ASSERT(func != NULL);
 
     allocate_tid(t);
     t->magic = THREAD_MAGIC;
-    t->idle = 0;
+    t->idle = true;
     t->func = func;
     t->aux = aux;
     t->status = THREAD_BLOCKED;
     t->stack = (uint8_t*)t + ALLOC_SIZE;
+
+    ASSERT(t->stack != NULL);
+
     t->stack -= sizeof(thread*);
     *((thread**)t->stack) = t;
     t->stack -= sizeof(void*);
     *((void**)t->stack) = thread_entry;
 
 
-    ctx_init(&t->context,t->stack);
-    ctx_restore(&t->context);
-
-
-    ASSERT(t->stack != NULL);
-    ASSERT(t->func != NULL);
-
-
-
-
-    //idle_thread = t;
-
-    //list_push_back(&thread_list, gen_node(idle_thread));
-
-    thread* tmp = thread_current();
+    list_push_back(&thread_list,gen_node(t));
+    thread_ready(t);
     
-    //print_list(&thread_list);
+    ctx_save(t->stack);
 
     return t->tid;
 }
@@ -58,11 +48,17 @@ tid_t thread_create(func_t* func, void* aux) {
 void thread_ready(thread* t) {
     ASSERT(t != NULL);
     ASSERT(t->status == THREAD_BLOCKED);
-    
+
+    t->status = THREAD_READY;
+    scheduler();
 }
 
 
 void thread_yield(void) {
+    //thread* t = thread_current();
+    //t->status = THREAD_RUNNING;
+    //ctx_switch(t->stack,idle_thread->stack);
+    ctx_restore(idle_thread->stack);
 }
 
 
@@ -105,12 +101,26 @@ void NORETURN thread_entry(void) {
 void NORETURN thread_exit(void) {
     thread* t = thread_current();
     ASSERT(t != NULL);
+
     t->status = THREAD_DYING;
-    free(t);
 
-    exit(0);
+    list_remove(&thread_list,gen_node(t));
+    //free(t);
 
+    scheduler();
 
     __builtin_unreachable();
 
+}
+
+
+void scheduler(void) {
+    node* head = thread_list.head;
+    if (thread_list.head == thread_list.tail) {
+        idle_thread = head->t;
+    } else {
+        idle_thread = head->next->t;
+    }
+    ASSERT(idle_thread != NULL);
+    thread_yield();
 }
