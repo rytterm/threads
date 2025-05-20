@@ -20,8 +20,7 @@ int main () {
     *i = 3.4f;
 
 
-    tid_t tid = thread_create((func_t*)f,i);
-    tid_t tid2 = thread_create((func_t*)f2,i);
+    thread* t = thread_create((func_t*)f2,(void*)1);
 
     return (EXIT_SUCCESS);
 }

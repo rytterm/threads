@@ -1,15 +1,15 @@
 #ifndef _THREAD_H_
 #define _THREAD_H_
 
-#include "context.h"
 #include "debug.h"
 #include "list.h"
 #include <stdint.h>
 #include <stdbool.h>
+#include "switch.h"
 
 #define THREAD_MAGIC    0xDEADBEEF
 #define STACK_SIZE      1024
-#define ALLOC_SIZE      4096
+#define ALLOC_SIZE      8192
 
 
 enum thread_status {
@@ -40,7 +40,7 @@ typedef struct Thread {
 
 
 void init_thread_system(void);
-tid_t thread_create(func_t*,void*);
+thread* thread_create(func_t*,void*);
 void thread_yield(void);
 void allocate_tid(thread*);
 thread* thread_current(void);
@@ -50,7 +50,9 @@ void thread_entry(void) NORETURN;
 void thread_exit(void) NORETURN;
 void scheduler(void);
 
-
+extern void NORETURN ctx_restore(uint8_t**);
+extern void ctx_save(uint8_t**);
+extern void ctx_switch(uint8_t**, uint8_t**);
 
 
 #endif

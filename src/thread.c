@@ -4,6 +4,7 @@
 
 static thread* idle_thread;
 static list thread_list;
+static uint8_t* main_stack = NULL;
 
 
 void init_thread_system(void) {
@@ -11,7 +12,7 @@ void init_thread_system(void) {
 }
 
 
-tid_t thread_create(func_t* func, void* aux) {
+thread* thread_create(func_t* func, void* aux) {
 
     void* memory;
     posix_memalign(&memory, ALLOC_SIZE, ALLOC_SIZE);
@@ -30,18 +31,24 @@ tid_t thread_create(func_t* func, void* aux) {
 
     ASSERT(t->stack != NULL);
 
-    t->stack -= sizeof(thread*);
-    *((thread**)t->stack) = t;
+
     t->stack -= sizeof(void*);
     *((void**)t->stack) = thread_entry;
 
-
     list_push_back(&thread_list,gen_node(t));
-    thread_ready(t);
-    
-    ctx_save(t->stack);
 
-    return t->tid;
+    //ctx_switch(&main_stack,t->stack);
+    ctx_save(&main_stack);
+    ctx_switch(&main_stack,&t->stack);
+
+    //thread_yield();
+
+    //thread_ready(t);
+    
+    //ctx_restore(t->stack);
+    thread_yield();
+
+    return t;
 }
 
 
@@ -55,10 +62,7 @@ void thread_ready(thread* t) {
 
 
 void thread_yield(void) {
-    //thread* t = thread_current();
-    //t->status = THREAD_RUNNING;
-    //ctx_switch(t->stack,idle_thread->stack);
-    ctx_restore(idle_thread->stack);
+    for (;;);
 }
 
 
@@ -90,9 +94,7 @@ void allocate_tid(thread* t) {
 
 void NORETURN thread_entry(void) {
     thread* t = thread_current();
-    ASSERT(t != NULL);
     ASSERT(t->func != NULL);
-    ASSERT(t->aux != NULL);
     t->func(t->aux);
     thread_exit();
     __builtin_unreachable();
@@ -100,16 +102,14 @@ void NORETURN thread_entry(void) {
 
 void NORETURN thread_exit(void) {
     thread* t = thread_current();
-    ASSERT(t != NULL);
 
-    t->status = THREAD_DYING;
-
-    list_remove(&thread_list,gen_node(t));
-    //free(t);
-
-    scheduler();
-
+    t->status = THREAD_DYING;  
+    //list_remove(&thread_list,gen_node(t)); 
+    ctx_restore(&main_stack);
     __builtin_unreachable();
+
+   // scheduler();
+    free(t);
 
 }
 
