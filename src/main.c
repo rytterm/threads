@@ -4,23 +4,31 @@
 #include "debug.h"
 #include "list.h"
 
-void f(void* i) {
-    float* fp = (float*)i;
-    printf("hello the number is: %f",*fp);
+
+void p1(int i) {
+    printf("Number for p1 is: %d\n",i);
 }
 
 
-void f2(int i) {
-    printf("hello the number is: %d",i);
+void hello_world(void) {
+    printf("Hello World!\n");
 }
+
+void third(bool b) {
+    if (b) printf("true\n");
+    else printf("false");
+}
+
 
 int main () {
     init_thread_system();
-    float* i = malloc(sizeof(float)); 
-    *i = 3.4f;
 
-
-    thread* t = thread_create((func_t*)f2,(void*)1);
+    thread* t1 = thread_create((func_t*)p1,(void*)1);
+    thread* t2 = thread_create((func_t*)hello_world, NULL);
+    thread* t3 = thread_create((func_t*)third,(void*)true);
+   
+    
+    print_thread_list();
 
     return (EXIT_SUCCESS);
 }

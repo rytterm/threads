@@ -6,10 +6,11 @@
 #include <stdint.h>
 #include <stdbool.h>
 #include "switch.h"
+#include "attr.h"
+
 
 #define THREAD_MAGIC    0xDEADBEEF
-#define STACK_SIZE      1024
-#define ALLOC_SIZE      8192
+#define ALLOC_SIZE      4096
 
 
 enum thread_status {
@@ -40,6 +41,8 @@ typedef struct Thread {
 
 
 void init_thread_system(void);
+void print_thread_list(void);
+
 thread* thread_create(func_t*,void*);
 void thread_yield(void);
 void allocate_tid(thread*);
@@ -48,7 +51,11 @@ thread* thread_running(void);
 void thread_ready(thread*);
 void thread_entry(void) NORETURN;
 void thread_exit(void) NORETURN;
+
 void scheduler(void);
+void enqueue_thread(thread*);
+
+
 
 extern void NORETURN ctx_restore(uint8_t**);
 extern void ctx_save(uint8_t**);

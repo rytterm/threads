@@ -3,7 +3,7 @@
 
 
 #include <stdint.h>
-#include "debug.h"
+#include "attr.h"
 
 void NORETURN ctx_restore(uint8_t**);
 void ctx_save(uint8_t**);

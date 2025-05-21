@@ -31,22 +31,10 @@ thread* thread_create(func_t* func, void* aux) {
 
     ASSERT(t->stack != NULL);
 
-
     t->stack -= sizeof(void*);
     *((void**)t->stack) = thread_entry;
 
-    list_push_back(&thread_list,gen_node(t));
-
-    //ctx_switch(&main_stack,t->stack);
-    ctx_save(&main_stack);
-    ctx_switch(&main_stack,&t->stack);
-
-    //thread_yield();
-
-    //thread_ready(t);
-    
-    //ctx_restore(t->stack);
-    thread_yield();
+    thread_ready(t);
 
     return t;
 }
@@ -57,6 +45,9 @@ void thread_ready(thread* t) {
     ASSERT(t->status == THREAD_BLOCKED);
 
     t->status = THREAD_READY;
+
+    list_push_back(&thread_list,gen_node(t));
+
     scheduler();
 }
 
@@ -104,23 +95,32 @@ void NORETURN thread_exit(void) {
     thread* t = thread_current();
 
     t->status = THREAD_DYING;  
-    //list_remove(&thread_list,gen_node(t)); 
+    list_remove(&thread_list,gen_node(t)); 
     ctx_restore(&main_stack);
     __builtin_unreachable();
 
-   // scheduler();
     free(t);
-
 }
+
+
+void print_thread_list(void) {
+    print_list(&thread_list);
+}
+
 
 
 void scheduler(void) {
-    node* head = thread_list.head;
-    if (thread_list.head == thread_list.tail) {
-        idle_thread = head->t;
-    } else {
-        idle_thread = head->next->t;
-    }
-    ASSERT(idle_thread != NULL);
-    thread_yield();
+    enqueue_thread(thread_list.head->t);
 }
+
+
+
+void enqueue_thread(thread* t) {
+    ASSERT(t != NULL);
+    ASSERT(t->magic == THREAD_MAGIC);
+    ASSERT(t->status == THREAD_READY);
+
+    ctx_switch(&main_stack,&t->stack);
+    scheduler();
+}
+
