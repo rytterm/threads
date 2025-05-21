@@ -27,7 +27,8 @@ int main () {
     thread* t2 = thread_create((func_t*)hello_world, NULL);
     thread* t3 = thread_create((func_t*)third,(void*)true);
    
-    
+    scheduler();
+
     print_thread_list();
 
     return (EXIT_SUCCESS);

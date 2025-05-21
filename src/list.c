@@ -19,31 +19,31 @@ void list_push_back(list* l, node* n) {
 }
 
 
-void list_remove(list* l, node* n) {
+void list_remove(list* l, thread* t) {
     ASSERT(l != NULL);
-    ASSERT(n != NULL);
+    ASSERT(t != NULL);
 
-    node* tmp = l->head;
     node* prev = NULL;
+    node* curr = l->head;
 
-    while (tmp != NULL) {
-        if (tmp == n) {
+    while (curr != NULL) {
+        if (curr->t == t) {
             if (prev == NULL) {
-                l->head = tmp->next;
-                if (l->tail == tmp) {
-                    l->tail = NULL;
-                }
+                l->head = curr->next;
             } else {
-                prev->next = tmp->next;
-                if (l->tail == tmp) {
-                    l->tail = prev;
-                }
+                prev->next = curr->next;
             }
-            free(tmp);
+
+            if (curr == l->tail) {
+                l->tail = prev;
+            }
+
+            free(curr);
             return;
         }
-        prev = tmp;
-        tmp = tmp->next;
+
+        prev = curr;
+        curr = curr->next;
     }
 }
 

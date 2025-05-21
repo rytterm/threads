@@ -47,8 +47,6 @@ void thread_ready(thread* t) {
     t->status = THREAD_READY;
 
     list_push_back(&thread_list,gen_node(t));
-
-    scheduler();
 }
 
 
@@ -95,7 +93,7 @@ void NORETURN thread_exit(void) {
     thread* t = thread_current();
 
     t->status = THREAD_DYING;  
-    list_remove(&thread_list,gen_node(t)); 
+    list_remove(&thread_list,t); 
     ctx_restore(&main_stack);
     __builtin_unreachable();
 
@@ -110,6 +108,8 @@ void print_thread_list(void) {
 
 
 void scheduler(void) {
+    // Threads finished running
+    if (thread_list.head == NULL) exit(EXIT_SUCCESS); 
     enqueue_thread(thread_list.head->t);
 }
 
