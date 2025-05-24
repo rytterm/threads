@@ -35,6 +35,7 @@ typedef struct Thread {
     func_t*             func;
     void*               aux;
     bool                idle;
+    
 } thread;
 
 

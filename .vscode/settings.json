@@ -3,6 +3,7 @@
         "debug.h": "c",
         "stdbool.h": "c",
         "list.h": "c",
-        "cstdlib": "c"
+        "cstdlib": "c",
+        "syscall.h": "c"
     }
 }
