@@ -4,6 +4,10 @@
 #include "thread.h"
 #include <stdbool.h>
 #include "debug.h"
+#include "attr.h"
+
+
+typedef void func_t (void* aux, ...);
 
 typedef struct Thread thread;
 

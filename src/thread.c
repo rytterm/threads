@@ -12,7 +12,7 @@ void init_thread_system(void) {
 }
 
 
-thread* thread_create(func_t* func, void* aux) {
+thread* thread_create(func_t* func, void* aux, int priority) {
 
     void* memory;
     posix_memalign(&memory, ALLOC_SIZE, ALLOC_SIZE);
@@ -23,9 +23,9 @@ thread* thread_create(func_t* func, void* aux) {
 
     allocate_tid(t);
     t->magic = THREAD_MAGIC;
-    t->idle = true;
     t->func = func;
     t->aux = aux;
+    t->priority = priority;
     t->status = THREAD_BLOCKED;
     t->stack = (uint8_t*)t + ALLOC_SIZE;
 
@@ -34,6 +34,8 @@ thread* thread_create(func_t* func, void* aux) {
     t->stack -= sizeof(void*);
     *((void**)t->stack) = thread_entry;
 
+    t->idle_time = time(NULL);
+    
     thread_ready(t);
 
     return t;
@@ -101,16 +103,40 @@ void NORETURN thread_exit(void) {
 }
 
 
+void update_prio(void) {
+    node* tmp = thread_list.head;
+    while (tmp != NULL) {
+        tmp->t->idle_time = time(NULL) - tmp->t->idle_time;
+        tmp->t->priority += tmp->t->idle_time;
+        tmp = tmp->next;
+    }
+}
+
+
 void print_thread_list(void) {
     print_list(&thread_list);
 }
 
 
-
+/* Schedule the next thread to run based on all threads priority */
 void scheduler(void) {
     // Threads finished running
     if (thread_list.head == NULL) exit(EXIT_SUCCESS); 
-    enqueue_thread(thread_list.head->t);
+
+    update_prio();
+
+    
+    node* curr = thread_list.head;
+    thread* next = curr->t;
+    while (curr != NULL) {
+        printf("%d\n",curr->t->priority);
+        if (curr->t->priority > next->priority) {
+            next = curr->t;
+        }
+        curr = curr->next;
+    }
+
+    enqueue_thread(next);
 }
 
 

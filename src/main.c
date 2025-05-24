@@ -23,9 +23,9 @@ void third(bool b) {
 int main () {
     init_thread_system();
 
-    thread* t1 = thread_create((func_t*)p1,(void*)1);
-    thread* t2 = thread_create((func_t*)hello_world, NULL);
-    thread* t3 = thread_create((func_t*)third,(void*)true);
+    thread* t1 = thread_create((func_t*)p1,(void*)1, 2);
+    thread* t2 = thread_create((func_t*)hello_world, NULL, 10);
+    thread* t3 = thread_create((func_t*)third,(void*)true, 15);
    
     scheduler();
 

@@ -7,6 +7,7 @@
 #include <stdbool.h>
 #include "switch.h"
 #include "attr.h"
+#include <time.h>
 
 
 #define THREAD_MAGIC    0xDEADBEEF
@@ -21,7 +22,9 @@ enum thread_status {
 };
 
 
-typedef void func_t (void* aux);
+
+
+typedef void func_t (void* aux, ...);
 
 typedef int tid_t;
 #define TID_ERROR ((tid_t) -1)
@@ -34,8 +37,8 @@ typedef struct Thread {
     enum thread_status  status;
     func_t*             func;
     void*               aux;
-    bool                idle;
-    
+    int                 priority;
+    time_t              idle_time;
 } thread;
 
 
@@ -44,7 +47,7 @@ typedef struct Thread {
 void init_thread_system(void);
 void print_thread_list(void);
 
-thread* thread_create(func_t*,void*);
+thread* thread_create(func_t*,void*,int);
 void thread_yield(void);
 void allocate_tid(thread*);
 thread* thread_current(void);
@@ -52,6 +55,7 @@ thread* thread_running(void);
 void thread_ready(thread*);
 void thread_entry(void) NORETURN;
 void thread_exit(void) NORETURN;
+void update_prio(void);
 
 void scheduler(void);
 void enqueue_thread(thread*);

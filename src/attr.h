@@ -3,8 +3,8 @@
 
 
 
-#define NORETURN __attribute__((noreturn))
-
+#define NORETURN    __attribute__((noreturn))
+#define UNUSED      __attribute__((unused))
 
 
 
